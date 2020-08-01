@@ -1,21 +1,16 @@
-import * as uuid from "uuid";
 import handler from "./libs/handler-lib";
 import dynamoDb from "./libs/dynamodb-lib";
 
 export const main = handler(async (event, context) => {
-  const data = JSON.parse(event.body);
   const params = {
     TableName: process.env.tableName,
-    Item: {
+    Key: {
       userId: event.requestContext.identity.cognitoIdentityId,
-      noteId: uuid.v1(),
-      content: data.content,
-      attachment: data.attachment,
-      createdAt: Date.now()
+      noteId: event.pathParameters.id
     }
   };
 
-  await dynamoDb.put(params);
+  await dynamoDb.delete(params);
 
-  return params.Item;
+  return { status: true };
 });
